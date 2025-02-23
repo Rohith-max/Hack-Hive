@@ -22,9 +22,3 @@ This project offers login for students (via phone/OTP), teachers (via email/pass
 - Teacher: `http://localhost:5000/teacher/login` (email: rohith@cambridge.edu.in, password: rohithpass123)
 - HOD: `http://localhost:5000/hod/` (implement login as needed)
 - Chatbot: Use chatbox on any page for queries (e.g., “What’s my schedule?”) or commands.
-
-## License
-MIT License (see [LICENSE](LICENSE) or add one).
-
-## Contact
-[Your Name] – [your-email@example.com]
