@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOD Interface</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }
+        .hod-container { max-width: 800px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        .hod-container h1 { color: #333; }
+        .form-group { margin: 15px 0; }
+        .form-group label { display: block; margin-bottom: 5px; color: #666; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px; }
+        .form-group button { padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        .form-group button:hover { background-color: #45a049; }
+        .list-group { margin-top: 20px; }
+        .list-group h3 { color: #333; }
+        .list-group p { color: #666; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="hod-container">
+        <h1>HOD Interface</h1>
+        
+        <!-- Create Teacher Form -->
+        <div class="form-group">
+            <h3>Create Teacher</h3>
+            <form id="createTeacherForm" action="/hod/create_teacher" method="POST">
+                <label for="teacher_name">Name:</label>
+                <input type="text" id="teacher_name" name="name" required>
+                <label for="teacher_email">Email:</label>
+                <input type="email" id="teacher_email" name="email" required>
+                <label for="teacher_password">Password:</label>
+                <input type="password" id="teacher_password" name="password" required aria-label="Teacher Password">
+                <label for="teacher_subject">Subject:</label>
+                <select name="subject" id="teacher_subject" required aria-label="Select Teacher Subject">
+                    <option value="Java">Java</option>
+                    <option value="Math">Math</option>
+                    <option value="Python">Python</option>
+                    <option value="DSA">DSA</option>
+                    <option value="Communication">Communication</option>
+                    <option value="PE">PE</option>
+                </select>
+                <label for="teacher_phone">Phone Number (Optional):</label>
+                <input type="tel" id="teacher_phone" name="phone_number">
+                <button type="submit">Create Teacher</button>
+            </form>
+        </div>
+
+        <!-- Create Student Form -->
+        <div class="form-group">
+            <h3>Create Student</h3>
+            <form id="createStudentForm" action="/hod/create_student" method="POST">
+                <label for="student_name">Name:</label>
+                <input type="text" id="student_name" name="name" required>
+                <label for="student_email">Email:</label>
+                <input type="email" id="student_email" name="email" required>
+                <label for="student_password">Password:</label>
+                <input type="password" id="student_password" name="password" required>
+                <label for="student_phone">Phone Number:</label>
+                <input type="tel" id="student_phone" name="phone_number" placeholder="e.g., 1234567890" required>
+                <label for="student_profile">Profile Data (JSON):</label>
+                <textarea id="student_profile" name="profile_data" required>{"grade": "10", "class": "A", "timetable": "Mon-Fri 9-3", "notifications": "New student"}</textarea>
+                <label for="class_timetable">Class Timetable (e.g., 10A.jpg):</label>
+                <input type="text" id="class_timetable" name="class_timetable" value="10B.jpg">
+                <button type="submit">Create Student</button>
+            </form>
+        </div>
+
+        <!-- Remove Teacher Form -->
+        <div class="form-group">
+            <h3>Remove Teacher</h3>
+            <form id="removeTeacherForm" action="/hod/remove_teacher" method="POST">
+                <label for="teacher_id">Teacher ID:</label>
+                <input type="number" id="teacher_id" name="teacher_id" required>
+                <button type="submit">Remove Teacher</button>
+            </form>
+        </div>
+
+        <!-- Remove Student Form -->
+        <div class="form-group">
+            <h3>Remove Student</h3>
+            <form id="removeStudentForm" action="/hod/remove_student" method="POST">
+                <label for="student_id">Student ID:</label>
+                <input type="number" id="student_id" name="student_id" required>
+                <button type="submit">Remove Student</button>
+            </form>
+        </div>
+
+        <!-- Update Timetable Form -->
+        <div class="form-group">
+            <h3>Update Student Timetable</h3>
+            <form id="updateTimetableForm" action="/hod/update_timetable" method="POST">
+                <label for="student_id">Student ID:</label>
+                <input type="number" id="student_id" name="student_id" required>
+                <label for="class_timetable">New Timetable (e.g., 10A.jpg):</label>
+                <input type="text" id="class_timetable" name="class_timetable" required>
+                <button type="submit">Update Timetable</button>
+            </form>
+        </div>
+
+        <!-- List Current Students and Teachers -->
+        <div class="list-group">
+            <h3>Current Students</h3>
+            {% for student in students %}
+                {% set profile_data = student[3] | json_parse if student[3] else {} %}
+                <p>ID: {{ student[0] }}, Name: {{ student[1] }}, Email: {{ student[2] }}, Phone: {{ profile_data.get('phone_number', 'Not set') }}, Class Timetable: {{ student[5] }}</p>
+            {% endfor %}
+            <h3>Current Teachers</h3>
+            {% for teacher in teachers %}
+                <p>ID: {{ teacher[0] }}, Name: {{ teacher[1] }}, Email: {{ teacher[2] }}, Subject: {{ teacher[3] }}, Phone: {{ teacher[4] or 'Not available' }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        // Handle form submissions with AJAX for better UX
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const url = form.action;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                });
+                const data = await response.json();
+                alert(data.message || data.error);
+                if (data.message && (url === '/hod/create_teacher' || url === '/hod/create_student' || url === '/hod/remove_teacher' || url === '/hod/remove_student' || url === '/hod/update_timetable')) {
+                    window.location.reload();  // Refresh to show updated list
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Attendance</title>  
+    <style>  
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }  
+        .attendance-container { max-width: 800px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }  
+        .attendance-container h1 { color: #333; text-align: center; margin-bottom: 20px; }  
+        .attendance-form { margin-top: 10px; }  
+        .attendance-form select, .attendance-form input { padding: 5px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px; width: 100%; }  
+        .attendance-form button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; }  
+        .attendance-form button:hover { background-color: #45a049; }  
+        .student-list { margin-top: 20px; }  
+        .student-list label { display: block; margin: 5px 0; }  
+        #chatbot-icon { position: fixed; bottom: 20px; right: 20px; font-size: 24px; background-color: #4CAF50; color: white; padding: 10px; border-radius: 50%; cursor: pointer; }  
+        .nav-buttons { margin-top: 20px; text-align: center; }  
+        .nav-buttons a { padding: 5px 10px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 3px; margin: 0 5px; }  
+        .nav-buttons a:hover { background-color: #45a049; }  
+    </style>  
+</head>  
+<body>  
+    <div class="attendance-container">  
+        <h1>Attendance (Subject: {{ teacher_subject }})</h1>  
+        <form method="POST">  
+            <input type="hidden" name="teacher_email" value="{{ teacher_email }}">  
+            <label for="class_name">Select Class:</label>  
+            <select name="class_name" id="class_name" required title="Select a class">  
+                {% for class in classes %}  
+                    <option value="{{ class }}">{{ class }}</option>  
+                {% endfor %}  
+            </select>  
+            <label>Date (Today: {{ datetime.now().strftime('%Y-%m-%d') }})</label>  
+            <input type="hidden" name="date" value="{{ datetime.now().strftime('%Y-%m-%d') }}">  
+            <div class="student-list">  
+                {% for student in students %}  
+                    {% set profile_data = student[2] | json_parse if student[2] else {} %}  
+                    {% if profile_data.get('class') + profile_data.get('grade', '') in classes %}  
+                        <label>  
+                            <input type="radio" name="student_{{ student[0] }}" value="Present" required> Present  
+                            <input type="radio" name="student_{{ student[0] }}" value="Absent"> Absent  
+                            {{ student[1] }} ({{ profile_data.get('phone_number', 'Not set') }})  
+                        </label>  
+                    {% endif %}  
+                {% endfor %}  
+            </div>  
+            <button type="submit">Submit Attendance</button>  
+        </form>  
+        <div class="nav-buttons">  
+            <a href="/teacher/dashboard?teacher_email={{ teacher_email }}">Dashboard</a>  
+            <a href="/teacher/academics?teacher_email={{ teacher_email }}">Update Marks</a>  
+            <a href="/teacher/resources?teacher_email={{ teacher_email }}">Resources</a>  
+            {% if teacher_subject == "PE" %}  
+                <a href="/teacher/extracurricular_updates?teacher_email={{ teacher_email }}">Extracurricular Updates</a>  
+            {% endif %}  
+        </div>  
+    </div>  
+    <div id="chatbot-icon">💬</div>  
+    <script>  
+        document.getElementById('chatbot-icon').addEventListener('click', async () => {  
+            const message = prompt("Ask the chatbot:");  
+            if (message) {  
+                const response = await fetch('/chatbot', {  
+                    method: 'POST',  
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
+                    body: `message=${encodeURIComponent(message)}&user_type=teacher&teacher_id=${encodeURIComponent('{{ teacher_email }}')}`  
+                });  
+                const data = await response.json();  
+                alert(data.response);  
+            }  
+        });  
+    </script>  
+</body>  
+</html>  

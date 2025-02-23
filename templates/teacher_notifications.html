@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans %}Notifications{% endtrans %} - {{ teacher[1] if teacher else 'Unknown' }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #fff; }
+        .notifications { max-width: 600px; margin: 0 auto; padding: 15px; border: 1px solid #ccc; }
+        h1 { text-align: center; margin-bottom: 15px; }
+        .notification-list { list-style: none; padding: 0; margin-bottom: 15px; }
+        li { margin: 5px 0; padding: 5px; border: 1px solid #ddd; border-radius: 3px; background: #f8f9fa; }
+        form { margin-bottom: 15px; }
+        select, input[type="text"] { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ccc; border-radius: 3px; }
+        button { padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .logout { text-align: right; margin-top: 15px; }
+        a.logout-btn { color: #dc3545; text-decoration: none; padding: 8px 15px; border: 1px solid #dc3545; border-radius: 3px; }
+        a.logout-btn:hover { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <div class="notifications">
+        <h1>{% trans %}Notifications{% endtrans %}</h1>
+        <ul class="notification-list">
+            {% for notification in notifications %}
+                <li>{% trans %}Message{% endtrans %}: {{ notification[1] }}, {% trans %}To{% endtrans %}: {{ notification[4] if notification[4] else 'All' }}, {% trans %}Date{% endtrans %}: {{ notification[3] }}</li>
+            {% endfor %}
+        </ul>
+        <form method="POST">
+            <input type="text" name="message" placeholder="{% trans %}Enter Notification Message{% endtrans %}" required>
+            <select name="student_ids" multiple size="5" aria-label="{% trans %}Select Students{% endtrans %}">
+                <option value="all">{% trans %}All Students{% endtrans %}</option>
+                {% for student in students %}
+                    <option value="{{ student[0] }}">{% trans %}Name{% endtrans %}: {{ student[1] }}, {% trans %}Class{% endtrans %}: {{ student[3] }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">{% trans %}Send Notification{% endtrans %}</button>
+        </form>
+        <div class="logout">
+            <a class="logout-btn" href="{{ url_for('teacher_login') }}">{% trans %}Logout{% endtrans %}</a>
+        </div>
+    </div>
+</body>
+</html>

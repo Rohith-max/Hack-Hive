@@ -1,0 +1,161 @@
+{
+    "teacher": {
+      "name": "Rohith",
+      "email": "rohith@cambridge.edu.in",
+      "password": "rohithpass123",  // This will be hashed in app.py using SHA-256
+      "subject": "Math",
+      "phone_number": "9876543210"
+    },
+    "students": [
+      {
+        "name": "Alice Smith",
+        "email": "alice.smith@cambridge.edu.in",
+        "password": "alicepass123",  // This will be hashed in app.py using SHA-256
+        "phone_number": "1234567890",
+        "profile_data": {
+          "phone_number": "1234567890",
+          "grade": "10",
+          "class": "B",
+          "notifications": [],
+          "messages": []
+        },
+        "profile_image": "default.jpg",
+        "class_timetable": "10B.jpg"
+      },
+      {
+        "name": "Bob Johnson",
+        "email": "bob.johnson@cambridge.edu.in",
+        "password": "bobpass123",
+        "phone_number": "2345678901",
+        "profile_data": {
+          "phone_number": "2345678901",
+          "grade": "10",
+          "class": "B",
+          "notifications": [],
+          "messages": []
+        },
+        "profile_image": "default.jpg",
+        "class_timetable": "10B.jpg"
+      },
+      {
+        "name": "Charlie Brown",
+        "email": "charlie.brown@cambridge.edu.in",
+        "password": "charliepass123",
+        "phone_number": "3456789012",
+        "profile_data": {
+          "phone_number": "3456789012",
+          "grade": "10",
+          "class": "B",
+          "notifications": [],
+          "messages": []
+        },
+        "profile_image": "default.jpg",
+        "class_timetable": "10B.jpg"
+      },
+      {
+        "name": "Diana Prince",
+        "email": "diana.prince@cambridge.edu.in",
+        "password": "dianapass123",
+        "phone_number": "4567890123",
+        "profile_data": {
+          "phone_number": "4567890123",
+          "grade": "10",
+          "class": "B",
+          "notifications": [],
+          "messages": []
+        },
+        "profile_image": "default.jpg",
+        "class_timetable": "10B.jpg"
+      },
+      {
+        "name": "Eve Adams",
+        "email": "eve.adams@cambridge.edu.in",
+        "password": "evepass123",
+        "phone_number": "5678901234",
+        "profile_data": {
+          "phone_number": "5678901234",
+          "grade": "10",
+          "class": "B",
+          "notifications": [],
+          "messages": []
+        },
+        "profile_image": "default.jpg",
+        "class_timetable": "10B.jpg"
+      },
+      {
+        "name": "Frank Wilson",
+        "email": "frank.wilson@cambridge.edu.in",
+        "password": "frankpass123",
+        "phone_number": "6789012345",
+        "profile_data": {
+          "phone_number": "6789012345",
+          "grade": "10",
+          "class": "B",
+          "notifications": [],
+          "messages": []
+        },
+        "profile_image": "default.jpg",
+        "class_timetable": "10B.jpg"
+      },
+      {
+        "name": "Grace Lee",
+        "email": "grace.lee@cambridge.edu.in",
+        "password": "gracepass123",
+        "phone_number": "7890123456",
+        "profile_data": {
+          "phone_number": "7890123456",
+          "grade": "10",
+          "class": "B",
+          "notifications": [],
+          "messages": []
+        },
+        "profile_image": "default.jpg",
+        "class_timetable": "10B.jpg"
+      },
+      {
+        "name": "Henry Clark",
+        "email": "henry.clark@cambridge.edu.in",
+        "password": "henrypass123",
+        "phone_number": "8901234567",
+        "profile_data": {
+          "phone_number": "8901234567",
+          "grade": "10",
+          "class": "B",
+          "notifications": [],
+          "messages": []
+        },
+        "profile_image": "default.jpg",
+        "class_timetable": "10B.jpg"
+      },
+      {
+        "name": "Ivy Parker",
+        "email": "ivy.parker@cambridge.edu.in",
+        "password": "ivypass123",
+        "phone_number": "9012345678",
+        "profile_data": {
+          "phone_number": "9012345678",
+          "grade": "10",
+          "class": "B",
+          "notifications": [],
+          "messages": []
+        },
+        "profile_image": "default.jpg",
+        "class_timetable": "10B.jpg"
+      },
+      {
+        "name": "Jack Turner",
+        "email": "jack.turner@cambridge.edu.in",
+        "password": "jackpass123",
+        "phone_number": "0123456789",
+        "profile_data": {
+          "phone_number": "0123456789",
+          "grade": "10",
+          "class": "B",
+          "notifications": [],
+          "messages": []
+        },
+        "profile_image": "default.jpg",
+        "class_timetable": "10B.jpg"
+      }
+    ]
+  }

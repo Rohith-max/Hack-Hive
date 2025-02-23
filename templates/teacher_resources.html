@@ -1,0 +1,73 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Teacher Resources</title>  
+    <style>  
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }  
+        .resources-container { max-width: 800px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }  
+        .resources-container h1 { color: #333; text-align: center; margin-bottom: 20px; }  
+        .resources-content { margin-top: 10px; color: #666; }  
+        .log-list { margin-top: 10px; }  
+        .log-list p { margin: 5px 0; border-bottom: 1px solid #ddd; padding: 5px; }  
+        .update-form { margin-top: 20px; display: {% if teacher_subject != "PE" %} none {% endif %}; }  
+        .update-form input, .update-form select, .update-form textarea { width: 100%; padding: 5px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px; }  
+        .update-form button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; }  
+        .update-form button:hover { background-color: #45a049; }  
+        #chatbot-icon { position: fixed; bottom: 20px; right: 20px; font-size: 24px; background-color: #4CAF50; color: white; padding: 10px; border-radius: 50%; cursor: pointer; }  
+        .nav-buttons { margin-top: 20px; text-align: center; }  
+        .nav-buttons a { padding: 5px 10px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 3px; margin: 0 5px; }  
+        .nav-buttons a:hover { background-color: #45a049; }  
+    </style>  
+</head>  
+<body>  
+    <div class="resources-container">  
+        <h1>Teacher Resources (Subject: {{ teacher_subject }})</h1>  
+        <div class="resources-content">  
+            <h3>Update History</h3>  
+            <div class="log-list">  
+                {% for log in resource_logs %}  
+                    {% set student = cursor.execute('SELECT name FROM students WHERE id = ?', (log[1],)).fetchone() %}  
+                    <p>{{ log[4] }} - {{ student[0] if student else 'Unknown Student' }} (Action: {{ log[2] }}, Details: {{ log[3] }})</p>  
+                {% endfor %}  
+            </div>  
+        </div>  
+        <div class="update-form">  
+            <h3>Extracurricular Updates (Nikhil Only)</h3>  
+            <form action="/teacher/extracurricular_updates" method="POST">  
+                <input type="hidden" name="teacher_email" value="{{ teacher_email }}">  
+                <label for="student_id">Select Student:</label>  
+                <select name="student_id" id="student_id" required aria-label="Select Student">  
+                    {% for student in cursor.execute('SELECT id, name FROM students').fetchall() %}  
+                        <option value="{{ student[0] }}">{{ student[1] }}</option>  
+                    {% endfor %}  
+                </select>  
+                <label for="achievement">Achievement:</label>  
+                <textarea name="achievement" placeholder="e.g., Won a marathon" required></textarea>  
+                <button type="submit">Log Achievement</button>  
+            </form>  
+        </div>  
+        <div class="nav-buttons">  
+            <a href="/teacher/dashboard?teacher_email={{ teacher_email }}">Dashboard</a>  
+            <a href="/teacher/academics?teacher_email={{ teacher_email }}">Update Marks</a>  
+            <a href="/teacher/attendance?teacher_email={{ teacher_email }}">Attendance</a>  
+        </div>  
+    </div>  
+    <div id="chatbot-icon">💬</div>  
+    <script>  
+        document.getElementById('chatbot-icon').addEventListener('click', async () => {  
+            const message = prompt("Ask the chatbot:");  
+            if (message) {  
+                const response = await fetch('/chatbot', {  
+                    method: 'POST',  
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
+                    body: `message=${encodeURIComponent(message)}&user_type=teacher&teacher_id=${encodeURIComponent('{{ teacher_email }}')}`  
+                });  
+                const data = await response.json();  
+                alert(data.response);  
+            }  
+        });  
+    </script>  
+</body>  
+</html>  

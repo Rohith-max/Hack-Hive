@@ -1,0 +1,51 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Profile</title>  
+    <style>  
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }  
+        .profile-container { max-width: 800px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }  
+        .profile-container h1 { color: #333; }  
+        .profile-image { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; margin: 20px auto; display: block; }  
+        .profile-details { margin-top: 20px; }  
+        .profile-details p { margin: 10px 0; color: #666; }  
+        #chatbot-icon { position: fixed; bottom: 20px; right: 20px; font-size: 24px; background-color: #4CAF50; color: white; padding: 10px; border-radius: 50%; cursor: pointer; }  
+    </style>  
+</head>  
+<body>  
+    <div class="profile-container">  
+        <h1>Profile: {{ name }}</h1>  
+        <img src="/uploads/{{ profile_image }}" alt="Profile Image" class="profile-image">  
+        <div class="profile-details">  
+            <p><strong>Email:</strong> {{ email }}</p>  
+            <p><strong>Grade:</strong> {{ profile_data.grade }}</p>  
+            <p><strong>Class:</strong> {{ profile_data.class }}</p>  
+            <p><strong>Leaves:</strong> {{ profile_data.timetable }}</p>  
+            <p><strong>Fee Details:</strong> {{ profile_data.fees }}</p>  
+            <p><strong>Notifications:</strong> {{ profile_data.notifications }}</p>  
+            <p><strong>Leaves:</strong> {{ profile_data.leaves }}</p>  
+            {% if profile_data.marks %}  
+                <p><strong>Marks:</strong> {{ profile_data.marks }}</p>  
+                <p><strong>Remarks:</strong> {{ profile_data.remarks }}</p>  
+            {% endif %}  
+        </div>  
+    </div>  
+    <div id="chatbot-icon">💬</div>  
+    <script>  
+        document.getElementById('chatbot-icon').addEventListener('click', async () => {  
+            const message = prompt("Ask the chatbot:");  
+            if (message) {  
+                const response = await fetch('/chatbot', {  
+                    method: 'POST',  
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
+                    body: `message=${encodeURIComponent(message)}&user_type=teacher&teacher_id={{ teacher_email }}`  
+                });  
+                const data = await response.json();  
+                alert(data.response);  
+            }  
+        });  
+    </script>  
+</body>  
+</html>  

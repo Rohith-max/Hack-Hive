@@ -1,0 +1,66 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Login</title>  
+    <style>  
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }  
+        .login-container { background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }  
+        .login-container h2 { text-align: center; color: #333; }  
+        .login-container input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }  
+        .login-container button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }  
+        .login-container button:hover { background-color: #45a049; }  
+        .otp-input { display: none; margin-top: 10px; }  
+        .otp-input input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; }  
+    </style>  
+</head>  
+<body>  
+    <div class="login-container">  
+        <h2>Student Login</h2>  
+        <form id="loginForm">  
+            <input type="tel" id="phone_number" placeholder="Phone Number (e.g., 1234567890)" required>  
+            <button type="submit">Get OTP</button>  
+        </form>  
+        <div class="otp-input" id="otpInput">  
+            <input type="text" id="otp" placeholder="Enter OTP" required>  
+            <button type="button" id="submitOtp">Submit OTP</button>  
+        </form>  
+        <p>Only for students. <a href="/teacher/login">Teacher Login</a> (No OTP required)</p>  
+    </div>  
+    <script>  
+        let phone_number = '';  
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {  
+            e.preventDefault();  
+            phone_number = document.getElementById('phone_number').value;  
+            const response = await fetch('/student/login', {  
+                method: 'POST',  
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
+                body: `phone_number=${encodeURIComponent(phone_number)}`  
+            });  
+            const data = await response.json();  
+            if (data.message === "OTP generated, enter it below") {  
+                document.getElementById('otpInput').style.display = 'block';  
+                document.getElementById('loginForm').style.display = 'none';  
+            } else if (data.error) {  
+                alert(data.error);  
+            }  
+        });  
+
+        document.getElementById('submitOtp').addEventListener('click', async () => {  
+            const otp = document.getElementById('otp').value;  
+            const response = await fetch('/student/login', {  
+                method: 'POST',  
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
+                body: `phone_number=${encodeURIComponent(phone_number)}&otp=${encodeURIComponent(otp)}`  
+            });  
+            const data = await response.json();  
+            if (data.message === "Login successful") {  
+                window.location.href = `/student/profile?student_id=${data.student_id}`;  
+            } else if (data.error) {  
+                alert(data.error);  
+            }  
+        });  
+    </script>  
+</body>  
+</html>  

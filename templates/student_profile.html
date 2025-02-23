@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+</head>
+<body>
+    <h1>Welcome, {{ name }}!</h1>
+    <img src="/uploads/{{ profile_image }}" alt="Profile Image" style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover;" onerror="this.src='/uploads/default.jpg'">
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="profile_image" accept="image/*" required>
+        <input type="hidden" name="student_id" value="{{ student_id }}">
+        <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Upload New Profile Image</button>
+    </form>
+    <div style="margin-top: 20px;">
+        <p><strong>Phone:</strong> {{ profile_data.phone_number }}</p>
+        <p><strong>Grade:</strong> {{ profile_data.grade }}</p>
+        <p><strong>Class:</strong> {{ profile_data.class }}</p>
+        <p><strong>Timetable:</strong> <img src="/uploads/{{ class_timetable }}" alt="Class Timetable" style="width: 100%; max-width: 400px;" onerror="this.src='/uploads/10B.jpg'"></p>
+        {% if test_results %}
+            <h3>Latest Test Results</h3>
+            <table border="1">
+                <tr>
+                    <th>Test Name</th>
+                    <th>Marks</th>
+                    <th>Remarks</th>
+                </tr>
+                {% for result in test_results[:3] %}  <!-- Show only the latest 3 results -->
+                    <tr>
+                        <td>{{ result[0] }}</td>
+                        <td>{{ result[1] }}</td>
+                        <td>{{ result[2] }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+        {% if extracurricular_updates %}
+            <h3>Extracurricular Achievements</h3>
+            {% for update in extracurricular_updates %}
+                <p><strong>{{ update[1] }}:</strong> {{ update[0] }} ({{ update[2] }})</p>
+            {% endfor %}
+        {% endif %}
+        {% if attendance %}
+            <p><strong>Attendance Today:</strong> {{ attendance[0] }} on {{ attendance[1] }}</p>
+        {% else %}
+            <p><strong>Attendance Today:</strong> Not recorded</p>
+        {% endif %}
+    </div>
+    <a href="/student/home?student_id={{ student_id }}">Home</a><br>
+    <a href="/student/results?student_id={{ student_id }}">Results</a><br>
+    <a href="/student/notifications?student_id={{ student_id }}">Notifications{% if unread_notifications > 0 %}<span class="unread-count">{{ unread_notifications }}</span>{% endif %}</a><br>
+    <a href="/student/teachers_contact?student_id={{ student_id }}">Teacher Contacts</a><br>
+    <div class="chatbox" id="chatbox" style="position: fixed; bottom: 20px; right: 20px; width: 300px; background-color: white; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <div class="chatbox-header" style="background-color: #4CAF50; color: white; padding: 10px; text-align: center; border-radius: 5px 5px 0 0;">Chat with AI</div>
+        <div class="chatbox-messages" id="chatMessages" style="height: 200px; overflow-y: auto; padding: 10px;"></div>
+        <div class="chatbox-input" style="padding: 10px; border-top: 1px solid #ddd;">
+            <input type="text" id="chatInput" placeholder="Type a message..." style="width: 70%; padding: 5px;">
+            <button onclick="sendMessage()" style="width: 25%; padding: 5px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Send</button>
+        </div>
+    </div>
+    <script>
+        let chatHistory = [];
+
+        function sendMessage() {
+            const message = document.getElementById('chatInput').value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage('You: ' + message, 'user-message');
+            document.getElementById('chatInput').value = '';
+
+            // Send message to server via AJAX, including user_type and user_id from session
+            fetch('/chatbot/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `message=${encodeURIComponent(message)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    addMessage('Bot: ' + data.error, 'bot-message');
+                } else {
+                    addMessage('Bot: ' + data.response, 'bot-message');
+                    // Update notifications for students
+                    if ('{{ session["user_type"] }}' === 'student') {
+                        const studentId = '{{ session["user_id"] }}';
+                        fetch(`/student/notifications?student_id=${studentId}`, { method: 'GET' })
+                        .then(resp => resp.text())
+                        .then(html => {
+                            const temp = document.createElement('div');
+                            temp.innerHTML = html;
+                            const notifications = temp.querySelectorAll('.notification-list p').length;
+                            document.querySelectorAll('.unread-count').forEach(count => count.textContent = notifications);
+                        });
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error in chat:', error);
+                addMessage('Bot: Error - ' + (error.message || 'Failed to communicate with server. Please try again.'), 'bot-message');
+            });
+        }
+
+        function addMessage(text, className) {
+            const messages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = className;
+            messageDiv.textContent = text;
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+            chatHistory.push({ text, type: className.includes('user') ? 'user' : 'bot' });
+        }
+
+        // Handle Enter key
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Load chat history on page load (optional, for persistence)
+        window.onload = function() {
+            chatHistory.forEach(msg => addMessage(msg.text, msg.type === 'user' ? 'user-message' : 'bot-message'));
+        };
+    </script>
+</body>
+</html>

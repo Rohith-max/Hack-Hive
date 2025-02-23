@@ -1,0 +1,164 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Update Marks</title>  
+    <style>  
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }  
+        .academics-container { max-width: 800px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }  
+        .academics-container h1 { color: #333; text-align: center; margin-bottom: 20px; }  
+        .student-list { margin-top: 10px; }  
+        .student-list form { margin: 10px 0; padding: 10px; background-color: #f9f9f9; border-radius: 3px; }  
+        .student-list input, .student-list select { padding: 5px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px; width: 100%; }  
+        .student-list input[readonly] { background-color: #f0f0f0; cursor: not-allowed; }  
+        .student-list button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; }  
+        .student-list button:hover { background-color: #45a049; }  
+        #chatbot-icon { position: fixed; bottom: 20px; right: 20px; font-size: 24px; background-color: #4CAF50; color: white; padding: 10px; border-radius: 50%; cursor: pointer; }  
+        .nav-buttons { margin-top: 20px; text-align: center; }  
+        .nav-buttons a { padding: 5px 10px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 3px; margin: 0 5px; }  
+        .nav-buttons a:hover { background-color: #45a049; }  
+        .message-form { margin-top: 20px; }  
+        .message-form select, .message-form input, .message-form textarea { width: 100%; padding: 5px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px; }  
+        .message-form button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; }  
+        .message-form button:hover { background-color: #45a049; }  
+        .student-checkbox { margin: 5px 0; }  
+        .test-form { margin-top: 20px; }  
+    </style>  
+</head>  
+<body>  
+    <div class="academics-container">  
+        <h1>Update Marks</h1>  
+        <div class="student-list">  
+            {% for student in students %}  
+                {% set profile_data = student[2] | json_parse if student[2] else {} %}  
+                <form action="/teacher/update_marks" method="POST">  
+                    <p>{{ student[1] }} (ID: {{ student[0] }}, Phone: {{ profile_data.get('phone_number', 'Not set') }})</p>  
+                    <input type="hidden" name="teacher_email" value="{{ teacher_email }}">  
+                    <input type="hidden" name="student_id" value="{{ student[0] }}">  
+                    <label for="subject">Subject:</label>
+                    <input type="text" id="subject" name="subject" value="{{ teacher_subject }}" readonly>  
+                    <label for="marks">Marks:</label>
+                    <input type="number" id="marks" name="marks" placeholder="Marks" required>  
+                    <label for="remarks">Remarks:</label>
+                    <input type="text" id="remarks" name="remarks" placeholder="Remarks" required>  
+                    <button type="submit">Update Marks</button>  
+                </form>  
+            {% endfor %}  
+        </div>  
+        <div class="test-form">  
+            <h3>Create New Test</h3>  
+            <form action="/teacher/create_test" method="POST">  
+                <input type="hidden" name="teacher_email" value="{{ teacher_email }}">  
+                <label for="test_name">Test Name:</label>  
+                <input type="text" id="test_name" name="test_name" required aria-label="Test Name">  
+                <label for="subject">Subject:</label>  
+                <select name="subject" id="subject" required aria-label="Subject">  
+                    <option value="Java">Java</option>  
+                    <option value="Math">Math</option>  
+                    <option value="Python">Python</option>  
+                    <option value="DSA">DSA</option>  
+                    <option value="Communication">Communication</option>  
+                    <option value="PE">PE</option>  
+                </select>  
+                <button type="submit">Create Test</button>  
+            </form>  
+        </div>  
+        <div class="test-form">  
+            <h3>Update Test Results</h3>  
+            <form action="/teacher/update_test_results" method="POST">  
+                <input type="hidden" name="teacher_email" value="{{ teacher_email }}">  
+                <label for="test_name">Test Name:</label>  
+                <input type="text" id="test_name" name="test_name" required aria-label="Test Name">  
+                <label for="student_id">Student ID:</label>  
+                <select name="student_id" id="student_id" required aria-label="Student ID">  
+                    {% for student in students %}  
+                        <option value="{{ student[0] }}">{{ student[1] }}</option>  
+                    {% endfor %}  
+                </select>  
+                <label for="marks">Marks:</label>  
+                <input type="number" id="marks" name="marks" required>  
+                <label for="remarks">Remarks:</label>  
+                <input type="text" id="remarks" name="remarks" required>  
+                <button type="submit">Update Results</button>  
+            </form>  
+        </div>  
+        <div class="message-form">  
+            <h3>Send Message</h3>  
+            <form id="sendMessageForm" action="/teacher/send_message" method="POST">  
+                <input type="hidden" name="teacher_email" value="{{ teacher_email }}">  
+                <label for="message_type">Message Type:</label>
+                <select name="message_type" id="message_type" required onchange="toggleMessageFields(this.value)">  
+                    <option value="individual">Individual Student</option>  
+                    <option value="multiple">Multiple Students</option>  
+                </select>  
+                <div id="individualFields" style="display: none;">  
+                    <label for="student_id">Select Student:</label>  
+                    <select name="student_id" required>  
+                        {% for student in students %}  
+                            {% set profile_data = student[2] | json_parse if student[2] else {} %}  
+                            <option value="{{ student[0] }}">{{ student[1] }} ({{ profile_data.get('phone_number', 'Not set') }})</option>  
+                        {% endfor %}  
+                    </select>  
+                </div>  
+                <div id="multipleFields" style="display: none;">  
+                    <label>Select Students:</label>  
+                    {% for student in students %}  
+                        {% set profile_data = student[2] | json_parse if student[2] else {} %}  
+                        <div class="student-checkbox">  
+                            <input type="checkbox" name="student_ids" value="{{ student[0] }}"> {{ student[1] }} ({{ profile_data.get('phone_number', 'Not set') }})  
+                        </div>  
+                    {% endfor %}  
+                </div>  
+                <label for="message_text">Message:</label>  
+                <textarea name="message_text" placeholder="Enter message" required></textarea>  
+                <button type="submit">Send Message</button>  
+            </form>  
+        </div>  
+        <div class="nav-buttons">  
+            <a href="/teacher/dashboard?teacher_email={{ teacher_email }}">Dashboard</a>  
+            <a href="/teacher/resources?teacher_email={{ teacher_email }}">Resources</a>  
+            <a href="/teacher/attendance?teacher_email={{ teacher_email }}">Attendance</a>  
+            {% if teacher_subject == "PE" %}  
+                <a href="/teacher/extracurricular_updates?teacher_email={{ teacher_email }}">Extracurricular Updates</a>  
+            {% endif %}  
+        </div>  
+    </div>  
+    <div id="chatbot-icon">💬</div>  
+    <script>  
+        document.getElementById('chatbot-icon').addEventListener('click', async () => {  
+            const message = prompt("Ask the chatbot:");  
+            if (message) {  
+                const response = await fetch('/chatbot', {  
+                    method: 'POST',  
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
+                    body: `message=${encodeURIComponent(message)}&user_type=teacher&teacher_id=${encodeURIComponent('{{ teacher_email }}')}`  
+                });  
+                const data = await response.json();  
+                alert(data.response);  
+            }  
+        });  
+
+        function toggleMessageFields(value) {  
+            document.getElementById('individualFields').style.display = 'none';  
+            document.getElementById('multipleFields').style.display = 'none';  
+            if (value === 'individual') {  
+                document.getElementById('individualFields').style.display = 'block';  
+            } else if (value === 'multiple') {  
+                document.getElementById('multipleFields').style.display = 'block';  
+            }  
+        }  
+
+        document.getElementById('sendMessageForm').addEventListener('submit', async (e) => {  
+            e.preventDefault();  
+            const formData = new FormData(e.target);  
+            const response = await fetch('/teacher/send_message', {  
+                method: 'POST',  
+                body: new URLSearchParams(formData)  
+            });  
+            const data = await response.json();  
+            alert(data.message || data.error);  
+        });  
+    </script>  
+</body>  
+</html>  

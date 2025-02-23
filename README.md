@@ -1,2 +1,0 @@
-# Hack-Hive
-Hackathon repo

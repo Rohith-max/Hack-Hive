@@ -1,0 +1,36 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Fee Details</title>  
+    <style>  
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }  
+        .fee-container { max-width: 600px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }  
+        .fee-container h1 { color: #333; }  
+        .fee-container p { color: #666; }  
+        #chatbot-icon { position: fixed; bottom: 20px; right: 20px; font-size: 24px; background-color: #4CAF50; color: white; padding: 10px; border-radius: 50%; cursor: pointer; }  
+    </style>  
+</head>  
+<body>  
+    <div class="fee-container">  
+        <h1>Fee Details</h1>  
+        <p>{{ fees }}</p>  
+    </div>  
+    <div id="chatbot-icon">💬</div>  
+    <script>  
+        document.getElementById('chatbot-icon').addEventListener('click', async () => {  
+            const message = prompt("Ask the chatbot:");  
+            if (message) {  
+                const response = await fetch('/chatbot', {  
+                    method: 'POST',  
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
+                    body: `message=${encodeURIComponent(message)}&user_type=student&student_id={{ student_id }}`  
+                });  
+                const data = await response.json();  
+                alert(data.response);  
+            }  
+        });  
+    </script>  
+</body>  
+</html>  
