@@ -1,97 +1,652 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Student Home - Scientia Demo School</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background: url(/static/images/school-bg.jpg) no-repeat;
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 20px;
+            color: #1E3A8A;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative; /* Ensure chatbox positioning works */
+        }
+
+        .nav-bar {
+            background: transparent;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-radius: 0 0 80px 80px;
+            height: 80px;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-fallback {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background-color: #F3F4F6;
+            color: #1E3A8A;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .avatar:hover {
+            transform: scale(1.2);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            font-size: 20px;
+            width: max-content;
+            border-radius: 10px;
+        }
+
+        .user-info span {
+            font-weight: 1000;
+            color: #F3F4F6;
+        }
+
+        .logout-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #1E3A8A;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            animation: popUp 0.5s ease-out forwards;
+        }
+
+        @keyframes popUp {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            80% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .logout-popup p {
+            font-size: 16px;
+            color: #1E3A8A;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .logout-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+        }
+
+        .logout-buttons button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .logout-buttons .yes-btn {
+            background: #F472B6;
+            color: white;
+        }
+
+        .logout-buttons .yes-btn:hover {
+            background: #e81e1e;
+        }
+
+        .logout-buttons .no-btn {
+            background: #37b2f4ce;
+            color: #1E3A8A;
+        }
+
+        .logout-buttons .no-btn:hover {
+            background: #0145ff;
+            color: white;
+        }
+
+        .logout-btn {
+            background: #F472B6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-left: 50%;
+        }
+
+        .logout-btn:hover {
+            background: #e81e1e;
+            transform: translateY(-2px);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-icon {
+            font-size: 30px;
+            color: #F3F4F6;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .notification-icon:hover {
+            color: #F472B6;
+            transform: scale(1.2);
+        }
+
+        .home-icon {
+            font-size: 30px;
+            color: #F3F4F6;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .home-icon:hover {
+            color: #48BB78;
+            transform: scale(1.2);
+        }
+
+        .home-container {
+            max-width: 1000px;
+            width: 90%;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            margin: 100px auto 20px; /* Adjusted for fixed navbar */
+            animation: spreadOut 0.8s ease-out forwards;
+        }
+
+        @keyframes spreadOut {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .home-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .home-header h1 {
+            font-size: 36px;
+            color: #0145ff;
+        }
+
+        .home-section {
+            margin-bottom: 30px;
+        }
+
+        .home-section h2 {
+            font-size: 24px;
+            color: #0145ff;
+            margin-bottom: 15px;
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .home-card {
+            background: #37b2f4ce;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            text-align: left;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: popUp 0.5s ease-out forwards;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .home-card:nth-child(1) { animation-delay: 0.2s; }
+        .home-card:nth-child(2) { animation-delay: 0.4s; }
+        .home-card:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes popUp {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            80% {
+                transform: scale(1.1); /* Slight overshoot for bounce */
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .home-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .home-card h3 {
+            font-size: 18px;
+            color: #1E3A8A;
+            margin-bottom: 10px;
+        }
+
+        .home-card p {
+            font-size: 14px;
+            color: #4A5568;
+            margin-bottom: 5px;
+        }
+
+        .chatbox {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex; /* Ensure chatbox is visible by default */
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .chatbox-header {
+            background: #F472B6;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .chatbox-messages {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            background: #F3F4F6;
+        }
+
+        .chatbox-messages p {
+            margin: 8px 0;
+            padding: 10px 12px;
+            border-radius: 6px;
+            max-width: 75%;
+            font-size: 14px;
+        }
+
+        .chatbox-messages .user-message {
+            background: #37b2f4ce;
+            margin-left: auto;
+            color: #1E3A8A;
+        }
+
+        .chatbox-messages .bot-message {
+            background: #F472B6;
+            color: white;
+        }
+
+        .chatbox-input {
+            padding: 12px;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .chatbox-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .chatbox-input button {
+            padding: 8px 16px;
+            background: #0145ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .chatbox-input button:hover {
+            background: #48BB78;
+        }
+
+        @media (max-width: 768px) {
+            .home-container {
+                padding: 20px;
+                margin: 80px auto 10px;
+                width: 85%;
+                max-width: 800px;
+            }
+
+            .home-header h1 {
+                font-size: 28px;
+            }
+
+            .home-section h2 {
+                font-size: 20px;
+            }
+
+            .home-card h3 {
+                font-size: 16px;
+            }
+
+            .home-card p {
+                font-size: 12px;
+            }
+
+            .nav-bar {
+                padding: 5px 10px;
+                height: 60px;
+            }
+
+            .avatar {
+                width: 30px;
+                height: 30px;
+            }
+
+            .notification-icon, .home-icon {
+                font-size: 24px;
+            }
+
+            .user-info span {
+                font-size: 16px;
+            }
+
+            .logout-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+
+            .chatbox {
+                width: 280px;
+                height: 450px;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .home-container {
+                padding: 15px;
+                margin: 60px auto 5px;
+                width: 80%;
+                max-width: 600px;
+            }
+
+            .home-header h1 {
+                font-size: 24px;
+            }
+
+            .home-section h2 {
+                font-size: 18px;
+            }
+
+            .home-card h3 {
+                font-size: 14px;
+            }
+
+            .home-card p {
+                font-size: 10px;
+            }
+
+            .nav-bar {
+                padding: 5px 10px;
+                height: 60px;
+            }
+
+            .avatar {
+                width: 25px;
+                height: 25px;
+            }
+
+            .notification-icon, .home-icon {
+                font-size: 20px;
+            }
+
+            .user-info span {
+                font-size: 14px;
+            }
+
+            .logout-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .chatbox {
+                width: 240px;
+                height: 400px;
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome, {{ name }}!</h1>
-    <p><strong>Timetable:</strong> <img src="/uploads/{{ class_timetable }}" alt="Class Timetable" onerror="this.src='/uploads/10B.jpg'"></p>
-    <a href="/student/profile?student_id={{ student_id }}">Profile</a><br>
-    <a href="/student/results?student_id={{ student_id }}">Results</a><br>
-    <a href="/student/notifications?student_id={{ student_id }}">Notifications{% if unread_notifications > 0 %}<span class="unread-count">{{ unread_notifications }}</span>{% endif %}</a><br>
-    <a href="/student/teachers_contact?student_id={{ student_id }}">Teacher Contacts</a><br>
-    <div>
-        <a href="/set_chatbot_language/en?student_id={{ student_id }}">English</a>
-        <a href="/set_chatbot_language/kn?student_id={{ student_id }}">Kannada</a>
-        <a href="/set_chatbot_language/hi?student_id={{ student_id }}">Hindi</a>
-    </div>
-    <div class="chatbox" id="chatbox" style="position: fixed; bottom: 20px; right: 20px; width: 300px; background-color: white; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-        <div class="chatbox-header" style="background-color: #4CAF50; color: white; padding: 10px; text-align: center; border-radius: 5px 5px 0 0;">Chat with AI</div>
-        <div class="chatbox-messages" id="chatMessages" style="height: 200px; overflow-y: auto; padding: 10px;"></div>
-        <div class="chatbox-input" style="padding: 10px; border-top: 1px solid #ddd;">
-            <input type="text" id="chatInput" placeholder="Type a message..." style="width: 70%; padding: 5px;">
-            <button onclick="sendMessage()" style="width: 25%; padding: 5px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Send</button>
+    <div class="logout-popup" id="logoutPopup">
+        <p>Are you sure you want to logout?</p>
+        <div class="logout-buttons">
+            <button class="yes-btn" onclick="confirmLogout()">Yes</button>
+            <button class="no-btn" onclick="cancelLogout()">No</button>
         </div>
     </div>
+    <nav class="nav-bar">
+        <div class="nav-left">
+            <div class="avatar" onclick="window.location.href='/student/profile?student_id={{ student_id }}'">
+                <img src="/uploads/{{ profile_image }}" alt="Profile" class="avatar-image" onerror="updateAvatarFallback()">
+            </div>
+            <div class="user-info">
+                <span>Name: {{ name }}</span>
+                <span>Class: {{ (profile_data|json_parse).get('grade', 'N/A') }}{{ (profile_data|json_parse).get('class', 'N/A') }}</span>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="showLogoutPopup()">Logout</button>
+        <div class="nav-right">
+            <i class='bx bxs-bell notification-icon' onclick="window.open('/student/notifications?student_id={{ student_id }}', '_blank')"></i>
+            <i class='bx bxs-home home-icon' onclick="window.location.href='/student/home?student_id={{ student_id }}'"></i>
+        </div>
+    </nav>
+
+    <div class="home-container">
+        <div class="home-header">
+            <h1>Home - {{ name }}</h1>
+        </div>
+        <div class="home-section">
+            <h2>Student Details</h2>
+            <div class="home-grid">
+                <div class="home-card" onclick="window.location.href='/student/profile?student_id={{ student_id }}'">
+                    <h3>Profile</h3>
+                    <p>View personal details and update profile image.</p>
+                </div>
+                <div class="home-card" onclick="window.location.href='/student/achievements?student_id={{ student_id }}'">
+                    <h3>Achievements</h3>
+                    <p>Check educational and extracurricular achievements.</p>
+                </div>
+                <div class="home-card" onclick="window.location.href='/student/teachers_contact?student_id={{ student_id }}'">
+                    <h3>Teacher Contacts</h3>
+                    <p>Contact your teachers for assistance.</p>
+                </div>
+            </div>
+        </div>
+        <div class="home-section">
+            <h2>Attendance</h2>
+            <p>Status: {{ attendance.status if attendance else 'Unknown' }} on {{ attendance.date if attendance else 'N/A' }}</p>
+            <p>Working Days: {{ working_days }}, Absent Days: {{ absent_days }}</p>
+            <a href="/student/attendance?student_id={{ student_id }}">View Full Attendance</a>
+        </div>
+        <div class="home-section">
+            <h2>Class Information</h2>
+            <p>Class: {{ class_section }}</p>
+            <p>Total Students in Class: {{ student_count }}</p>
+            <a href="/student/class_students?student_id={{ student_id }}">View Classmates</a>
+        </div>
+    </div>
+
+    <div class="chatbox">
+        <div class="chatbox-header">Chat with Bot</div>
+        <div class="chatbox-messages" id="chatboxMessages"></div>
+        <div class="chatbox-input">
+            <input type="text" id="chatboxInput" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
     <script>
-        let chatHistory = [];
+        function showLogoutPopup() {
+            document.getElementById("logoutPopup").style.display = "block";
+        }
+    
+        function confirmLogout() {
+            window.location.href = "/student/login";
+        }
+    
+        function cancelLogout() {
+            document.getElementById("logoutPopup").style.display = "none";
+        }
+
+        function updateAvatarFallback() {
+            const avatar = document.querySelector('.avatar');
+            const name = "{{ name }}";
+            const initials = name ? (name.split(' ').length > 1 ? name.split(' ')[0][0] + name.split(' ')[1][0] : name[0]) : 'N/A';
+            avatar.innerHTML = `<div class="avatar-fallback">${initials}</div>`;
+        }
+
+        function addBotMessage(message) {
+            const messages = document.getElementById("chatboxMessages");
+            const msg = document.createElement("p");
+            msg.className = "bot-message";
+            msg.textContent = message;
+            messages.appendChild(msg);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function addUserMessage(message) {
+            const messages = document.getElementById("chatboxMessages");
+            const msg = document.createElement("p");
+            msg.className = "user-message";
+            msg.textContent = message;
+            messages.appendChild(msg);
+            messages.scrollTop = messages.scrollHeight;
+        }
 
         function sendMessage() {
-            const message = document.getElementById('chatInput').value.trim();
-            if (!message) return;
-
-            // Add user message to chat
-            addMessage('You: ' + message, 'user-message');
-            document.getElementById('chatInput').value = '';
-
-            // Send message to server via AJAX, including user_type and user_id from session
-            fetch('/chatbot/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `message=${encodeURIComponent(message)}`
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            const input = document.getElementById("chatboxInput");
+            const message = input.value.trim();
+            if (message) {
+                addUserMessage(message);
+                input.value = "";
+                
+                // Simple bot response (can be expanded with AJAX to app.py)
+                let botResponse = "I'm a simple bot. How can I help?";
+                if (message.toLowerCase().includes("hello")) {
+                    botResponse = "Hello! How can I assist you today?";
+                } else if (message.toLowerCase().includes("help")) {
+                    botResponse = "You can ask about your profile, attendance, or contact teachers.";
+                } else if (message.toLowerCase().includes("bye")) {
+                    botResponse = "Goodbye! Feel free to chat again.";
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    addMessage('Bot: ' + data.error, 'bot-message');
-                } else {
-                    addMessage('Bot: ' + data.response, 'bot-message');
-                    // Update notifications for students
-                    if ('{{ session["user_type"] }}' === 'student') {
-                        const studentId = '{{ session["user_id"] }}';
-                        fetch(`/student/notifications?student_id=${studentId}`, { method: 'GET' })
-                        .then(resp => resp.text())
-                        .then(html => {
-                            const temp = document.createElement('div');
-                            temp.innerHTML = html;
-                            const notifications = temp.querySelectorAll('.notification-list p').length;
-                            document.querySelectorAll('.unread-count').forEach(count => count.textContent = notifications);
-                        });
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error in chat:', error);
-                addMessage('Bot: Error - ' + (error.message || 'Failed to communicate with server. Please try again.'), 'bot-message');
-            });
+                addBotMessage(botResponse);
+            }
         }
 
-        function addMessage(text, className) {
-            const messages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = className;
-            messageDiv.textContent = text;
-            messages.appendChild(messageDiv);
-            messages.scrollTop = messages.scrollHeight;
-            chatHistory.push({ text, type: className.includes('user') ? 'user' : 'bot' });
-        }
-
-        // Handle Enter key
-        document.getElementById('chatInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendMessage();
+        // Allow Enter key to send message
+        document.getElementById("chatboxInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
         });
-
-        // Load chat history on page load (optional, for persistence)
-        window.onload = function() {
-            chatHistory.forEach(msg => addMessage(msg.text, msg.type === 'user' ? 'user-message' : 'bot-message'));
-        };
     </script>
 </body>
 </html>
