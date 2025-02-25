@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HOD Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Welcome, {{ hod_data.name }}</h1>
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3>Department</h3>
+                <p>{{ dept_stats.dept_name }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Teachers</h3>
+                <p>{{ dept_stats.teacher_count }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Students</h3>
+                <p>{{ dept_stats.student_count }}</p>
+            </div>
+        </div>
+        <div class="action-buttons">
+            <a href="/hod/manage-teachers" class="btn">Manage Teachers</a>
+            <a href="/hod/manage-students" class="btn">Manage Students</a>
+            <a href="/hod/reports" class="btn">View Reports</a>
+        </div>
+    </div>
+</body>
+</html> 
