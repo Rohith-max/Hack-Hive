@@ -1,107 +1,690 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Results</title>
+    <title>Academic Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            padding-top: 120px; /* Space for fixed navbar */
+            background: url(/static/images/caroo.png) no-repeat;
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #1E3A8A;
+        }
+
+        .nav-bar {
+            background: transparent;
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            max-width: 1000px;
+            top: 0;
+            z-index: 1001;
+            border-radius: 0 0 80px 80px;
+            height: 80px;
+            animation: fadeIn 0.5s ease-out forwards;
+            box-sizing: border-box;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-fallback {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background-color: #F3F4F6;
+            color: #1E3A8A;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .avatar:hover {
+            transform: scale(1.2);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            font-size: 18px;
+            width: max-content;
+            border-radius: 10px;
+        }
+
+        .user-info span {
+            font-weight: 1000;
+            color: #F3F4F6;
+        }
+
+        .logout-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #1E3A8A;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            animation: popUp 0.5s ease-out forwards;
+        }
+
+        @keyframes popUp {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            80% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .logout-popup p {
+            font-size: 16px;
+            color: #1E3A8A;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .logout-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+        }
+
+        .logout-buttons button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .logout-buttons .yes-btn {
+            background: #F472B6;
+            color: white;
+        }
+
+        .logout-buttons .yes-btn:hover {
+            background: #e81e1e;
+        }
+
+        .logout-buttons .no-btn {
+            background: #37b2f4ce;
+            color: #1E3A8A;
+        }
+
+        .logout-buttons .no-btn:hover {
+            background: #0145ff;
+            color: white;
+        }
+
+        .logout-btn {
+            background: #F472B6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-left: 30px;
+        }
+
+        .logout-btn:hover {
+            background: #e81e1e;
+            transform: translateY(-2px);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .home-icon, .notification-icon {
+            font-size: 36px;
+            color: #F3F4F6;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .home-icon:hover, .notification-icon:hover {
+            color: #F472B6;
+            transform: scale(1.2);
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            overflow: hidden;
+            box-sizing: border-box;
+            padding: 20px;
+            animation: popUp 0.8s ease-out forwards;
+        }
+
+        @keyframes popUp {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            80% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .header {
+            background-color: #2b2bf1da;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            border-bottom: 1px solid #ddd;
+            margin: 10px 0;
+            background-color: #f5f5f5;
+        }
+
+        .nav-tabs button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin: 0 5px;
+            color: #3d19e2;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .nav-tabs button.active {
+            border-bottom-color: #4147f3ca;
+            color: #1a73e8;
+            font-weight: bold;
+        }
+
+        .report-card {
+            padding: 20px;
+        }
+
+        .report-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffffff;
+            font-size: 22px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border: 1px solid #ffffff;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #f0f0f0;
+        }
+
+        .obtained-marks {
+            color: #d32f2f;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            font-size: 12px;
+            border-top: 1px solid #ddd;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: slideIn 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .overall-performance {
+            padding: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        .tab-content.active .overall-performance {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .overall-title {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .pie-charts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .chart-container {
+            margin: 0;
+            width: 100%;
+            height: 300px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .pie-charts {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 8px;
+            }
+            .nav-tabs button {
+                padding: 8px 15px;
+            }
+            .pie-charts {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .chart-container {
+                height: 200px;
+                padding: 10px;
+            }
+            .nav-bar {
+                padding: 5px 10px;
+                height: 50px;
+            }
+            .home-icon, .notification-icon {
+                font-size: 24px;
+            }
+            .user-info span {
+                font-size: 14px;
+            }
+            .logout-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+                margin-left: 10px;
+            }
+            body {
+                padding-top: 70px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>{{ name }}'s Results</h1>
-    <div>
-        <table border="1">
-            <tr>
-                <th>Test Name</th>
-                <th>Marks</th>
-                <th>Remarks</th>
-            </tr>
-            {% for result in test_results %}
-                <tr>
-                    <td>{{ result[0] }}</td>
-                    <td>{{ result[1] }}</td>
-                    <td>{{ result[2] }}</td>
-                </tr>
-            {% endfor %}
-        </table>
-        <p>Total Marks: {{ total_marks }} / {{ total_possible_marks }}</p>
-    </div>
-    <a href="/student/profile?student_id={{ student_id }}">Profile</a><br>
-    <a href="/student/home?student_id={{ student_id }}">Home</a><br>
-    <a href="/student/notifications?student_id={{ student_id }}">Notifications{% if unread_notifications > 0 %}<span class="unread-count">{{ unread_notifications }}</span>{% endif %}</a><br>
-    <div class="chatbox" id="chatbox" style="position: fixed; bottom: 20px; right: 20px; width: 300px; background-color: white; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-        <div class="chatbox-header" style="background-color: #4CAF50; color: white; padding: 10px; text-align: center; border-radius: 5px 5px 0 0;">Chat with AI</div>
-        <div class="chatbox-messages" id="chatMessages" style="height: 200px; overflow-y: auto; padding: 10px;"></div>
-        <div class="chatbox-input" style="padding: 10px; border-top: 1px solid #ddd;">
-            <input type="text" id="chatInput" placeholder="Type a message..." style="width: 70%; padding: 5px;">
-            <button onclick="sendMessage()" style="width: 25%; padding: 5px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Send</button>
+    <div class="logout-popup" id="logoutPopup">
+        <p>Are you sure you want to logout?</p>
+        <div class="logout-buttons">
+            <button class="yes-btn" onclick="confirmLogout()">Yes</button>
+            <button class="no-btn" onclick="cancelLogout()">No</button>
         </div>
     </div>
+    <nav class="nav-bar">
+        <div class="nav-left">
+            <div class="avatar" onclick="window.location.href='/student/profile?student_id={{ student_id }}'">
+                <img src="/uploads/{{ profile_image }}" alt="Profile" class="avatar-image" onerror="updateAvatarFallback()">
+            </div>
+            <div class="user-info">
+                <span>Name: {{ name }}</span>
+                <span>Class: {{ profile_data.get('grade', 'N/A') }}</span>
+                <span>Section: {{ profile_data.get('class', 'N/A') }}</span>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="showLogoutPopup()">Logout</button>
+        <div class="nav-right">
+            <i class='bx bxs-home home-icon' onclick="window.location.href='/student/home?student_id={{ student_id }}'"></i>
+            <i class='bx bxs-bell notification-icon' onclick="window.open('/student/notifications?student_id={{ student_id }}', '_blank')"></i>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="header">
+            <h2>Academic Results</h2>
+        </div>
+
+        <div class="nav-tabs">
+            {% if tests is defined and tests %}
+                {% for test in tests %}
+                    <button class="{{ 'active' if loop.first else '' }}" onclick="showTab('{{ test.name }}')">{{ test.name }}</button>
+                {% endfor %}
+            {% else %}
+                <p>No tests available.</p>
+            {% endif %}
+            <button onclick="showTab('overall')">Overall</button>
+        </div>
+
+        <div class="report-card">
+            {% if tests is defined and tests %}
+                {% for test in tests %}
+                    <div id="{{ test.name }}" class="tab-content {{ 'active' if loop.first else '' }}">
+                        <h3 class="report-title">Report Card - {{ test.name }}</h3>
+                        <h4 style="color: #fff;">Academic Year: {{ test.created_at.strftime('%Y-%m-%d') if test.created_at is defined and test.created_at else 'N/A' }}</h4>
+
+                        <h4 style="color: #fff;">Part A</h4>
+                        <table>
+                            <tr>
+                                <th>Subject Name</th>
+                                <th>Marks ({{ test.max_marks if test.max_marks is defined else 20 }})</th>
+                            </tr>
+                            {% if test_results is defined and test_results.get(test.name, []) %}
+                                {% for result in test_results[test.name] %}
+                                    <tr>
+                                        <td>{{ result.subject if result.subject is defined else 'N/A' }}</td>
+                                        <td>{{ result.marks if result.marks is defined and result.marks is not none else 0 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="2">No results available for this test.</td>
+                                </tr>
+                            {% endif %}
+                            <tr class="total-row">
+                                <td>Obtained Marks</td>
+                                <td class="obtained-marks">{{ test_results[test.name]|sum(attribute='marks') if test_results is defined and test_results.get(test.name, []) else 0 }}</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td>Total Marks</td>
+                                <td>{{ (test.max_marks if test.max_marks is defined else 20) * (test_results[test.name]|length if test_results is defined and test_results.get(test.name, []) else 0) }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No tests available to display.</p>
+            {% endif %}
+
+            <div id="overall" class="tab-content">
+                <div class="overall-performance">
+                    <h3 class="overall-title">Overall Performance</h3>
+                    <h4 style="color: #fff;">Academic Year: {{ tests|map(attribute='created_at')|max|datetimeformat('%Y-%m-%d') if tests is defined and tests else (now.strftime('%Y-%m-%d') if now is defined else 'N/A') }}</h4>
+                    <div class="pie-charts">
+                        {% if subjects is defined and subjects %}
+                            {% for subject, score in subjects.items() %}
+                                <div class="chart-container">
+                                    <canvas id="{{ subject|replace(' ', '_') }}Chart"></canvas>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>No overall performance data available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>DATE: {{ now.strftime('%d-%m-%Y') if now is defined else 'N/A' }}</p>
+            <p>©2025 SchoolPhins The Wings of an Education</p>
+        </div>
+    </div>
+
     <script>
-        let chatHistory = [];
+        let performanceChart;
 
-        function sendMessage() {
-            const message = document.getElementById('chatInput').value.trim();
-            if (!message) return;
+        function showTab(tabName) {
+            const tabs = document.getElementsByClassName('tab-content');
+            for (let tab of tabs) {
+                tab.classList.remove('active');
+            }
+            const activeTab = document.getElementById(tabName);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
 
-            // Add user message to chat
-            addMessage('You: ' + message, 'user-message');
-            document.getElementById('chatInput').value = '';
+            const buttons = document.getElementsByTagName('button');
+            for (let button of buttons) {
+                button.classList.remove('active');
+            }
+            // Safely add 'active' to the clicked button
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
 
-            // Send message to server via AJAX, including user_type and user_id from session
-            fetch('/chatbot/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `message=${encodeURIComponent(message)}`
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    addMessage('Bot: ' + data.error, 'bot-message');
-                } else {
-                    addMessage('Bot: ' + data.response, 'bot-message');
-                    // Update notifications for students
-                    if ('{{ session["user_type"] }}' === 'student') {
-                        const studentId = '{{ session["user_id"] }}';
-                        fetch(`/student/notifications?student_id=${studentId}`, { method: 'GET' })
-                        .then(resp => resp.text())
-                        .then(html => {
-                            const temp = document.createElement('div');
-                            temp.innerHTML = html;
-                            const notifications = temp.querySelectorAll('.notification-list p').length;
-                            document.querySelectorAll('.unread-count').forEach(count => count.textContent = notifications);
-                        });
+            if (tabName === 'overall') {
+                resetAndAnimatePieCharts();
+            }
+        }
+
+        function resetAndAnimatePieCharts() {
+            if (window.pieCharts && window.pieCharts.length > 0) {
+                window.pieCharts.forEach(chart => {
+                    if (chart) chart.destroy();
+                });
+            }
+
+            window.pieCharts = [];
+            {% if subjects is defined and subjects %}
+                {% for subject, score in subjects.items() %}
+                    const subjectData = {{ score }};
+                    if (subjectData !== undefined && !isNaN(subjectData) && subjectData >= 0 && subjectData <= 100) {
+                        window.pieCharts.push(createPieChart('{{ subject|replace(' ', '_') }}Chart', '{{ subject }}', subjectData, '{{ subject }}'));
+                    } else {
+                        console.warn(`Invalid data for subject ${'{{ subject }}'}: ${subjectData}`);
                     }
+                {% endfor %}
+            {% else %}
+                console.warn('No subjects data available for pie charts.');
+            {% endif %}
+        }
+
+        function createPieChart(canvasId, label, data, title) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                console.error(`Canvas element with ID ${canvasId} not found`);
+                return null;
+            }
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error(`Failed to get 2D context for canvas ${canvasId}`);
+                return null;
+            }
+
+            let chart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Obtained', 'Remaining'],
+                    datasets: [{
+                        data: [0, 100],  // Initial data for animation
+                        backgroundColor: ['#36A2EB', '#e0e0e0']
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title,
+                            font: { size: 16 }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart',
+                        animateRotate: true,
+                        onComplete: function() {
+                            if (chart && chart.data && chart.data.datasets && chart.data.datasets[0]) {
+                                chart.data.datasets[0].data = [data, 100 - data];
+                                chart.update();
+                            } else {
+                                console.error('Chart or dataset not properly initialized');
+                            }
+                        }
+                    },
+                    rotation: 360,
+                    circumference: 360
                 }
-            })
-            .catch(error => {
-                console.error('Error in chat:', error);
-                addMessage('Bot: Error - ' + (error.message || 'Failed to communicate with server. Please try again.'), 'bot-message');
             });
+
+            setTimeout(() => {
+                if (chart && chart.data && chart.data.datasets && chart.data.datasets[0]) {
+                    chart.data.datasets[0].data = [data, 100 - data];
+                    chart.update({ duration: 2000, easing: 'easeOutQuart' });
+                }
+            }, 100);
+
+            return chart;
         }
 
-        function addMessage(text, className) {
-            const messages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = className;
-            messageDiv.textContent = text;
-            messages.appendChild(messageDiv);
-            messages.scrollTop = messages.scrollHeight;
-            chatHistory.push({ text, type: className.includes('user') ? 'user' : 'bot' });
-        }
-
-        // Handle Enter key
-        document.getElementById('chatInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendMessage();
+        document.addEventListener('DOMContentLoaded', function() {
+            window.pieCharts = [];
+            {% if subjects is defined and subjects %}
+                {% for subject, score in subjects.items() %}
+                    const subjectData = {{ score }};
+                    if (subjectData !== undefined && !isNaN(subjectData) && subjectData >= 0 && subjectData <= 100) {
+                        window.pieCharts.push(createPieChart('{{ subject|replace(' ', '_') }}Chart', '{{ subject }}', subjectData, '{{ subject }}'));
+                    }
+                {% endfor %}
+            {% endif %}
         });
 
-        // Load chat history on page load (optional, for persistence)
-        window.onload = function() {
-            chatHistory.forEach(msg => addMessage(msg.text, msg.type === 'user' ? 'user-message' : 'bot-message'));
-        };
+        function showLogoutPopup() {
+            document.getElementById("logoutPopup").style.display = "block";
+        }
+    
+        function confirmLogout() {
+            window.location.href = "/student/login";
+        }
+    
+        function cancelLogout() {
+            document.getElementById("logoutPopup").style.display = "none";
+        }
+
+        // Function to update avatar fallback on image load error
+        function updateAvatarFallback() {
+            const avatar = document.querySelector('.avatar');
+            if (avatar) {
+                const name = "{{ name }}";
+                const initials = name ? (name.split(' ').length > 1 ? name.split(' ')[0][0] + name.split(' ')[1][0] : name[0]) : 'N/A';
+                avatar.innerHTML = `<div class="avatar-fallback">${initials}</div>`;
+            } else {
+                console.warn('Avatar element not found');
+            }
+        }
     </script>
 </body>
 </html>
