@@ -1,66 +1,377 @@
-<!DOCTYPE html>  
-<html>  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>Login</title>  
-    <style>  
-        body { font-family: Arial, sans-serif; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }  
-        .login-container { background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }  
-        .login-container h2 { text-align: center; color: #333; }  
-        .login-container input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }  
-        .login-container button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }  
-        .login-container button:hover { background-color: #45a049; }  
-        .otp-input { display: none; margin-top: 10px; }  
-        .otp-input input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; }  
-    </style>  
-</head>  
-<body>  
-    <div class="login-container">  
-        <h2>Student Login</h2>  
-        <form id="loginForm">  
-            <input type="tel" id="phone_number" placeholder="Phone Number (e.g., 1234567890)" required>  
-            <button type="submit">Get OTP</button>  
-        </form>  
-        <div class="otp-input" id="otpInput">  
-            <input type="text" id="otp" placeholder="Enter OTP" required>  
-            <button type="button" id="submitOtp">Submit OTP</button>  
-        </form>  
-        <p>Only for students. <a href="/teacher/login">Teacher Login</a> (No OTP required)</p>  
-    </div>  
-    <script>  
-        let phone_number = '';  
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {  
-            e.preventDefault();  
-            phone_number = document.getElementById('phone_number').value;  
-            const response = await fetch('/student/login', {  
-                method: 'POST',  
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
-                body: `phone_number=${encodeURIComponent(phone_number)}`  
-            });  
-            const data = await response.json();  
-            if (data.message === "OTP generated, enter it below") {  
-                document.getElementById('otpInput').style.display = 'block';  
-                document.getElementById('loginForm').style.display = 'none';  
-            } else if (data.error) {  
-                alert(data.error);  
-            }  
-        });  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
 
-        document.getElementById('submitOtp').addEventListener('click', async () => {  
-            const otp = document.getElementById('otp').value;  
-            const response = await fetch('/student/login', {  
-                method: 'POST',  
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
-                body: `phone_number=${encodeURIComponent(phone_number)}&otp=${encodeURIComponent(otp)}`  
-            });  
-            const data = await response.json();  
-            if (data.message === "Login successful") {  
-                window.location.href = `/student/profile?student_id=${data.student_id}`;  
-            } else if (data.error) {  
-                alert(data.error);  
-            }  
-        });  
-    </script>  
-</body>  
-</html>  
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: url(../static/images/library.jpg) no-repeat;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .wrapper {
+            width: 420px;
+            background: transparent;
+            border: 2px solid rgb(94, 94, 94);
+            backdrop-filter: blur(3px);
+            color: rgb(255, 255, 255);
+            border-radius: 90px;
+            padding: 80px 20px;
+        }
+
+        .wrapper h2 {
+            font-size: 36px;
+            text-align: center;
+        }
+
+        .wrapper .input-box {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            margin: 30px 0;
+        }
+
+        .input-box input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            border-radius: 40px;
+            font-size: 16px;
+            color: rgb(0, 0, 0);
+            padding: 20px 45px 20px 20px;
+        }
+
+        .input-box input::placeholder {
+            color: #ffffff;
+            font-size: larger;
+            text-align: center;
+            margin-right: 20%;
+        }
+
+        .input-box input:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(0, 0, 0, 0.5);
+            cursor: not-allowed;
+        }
+
+        .input-box i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+        }
+
+        .wrapper button {
+            width: 100%;
+            height: 45px;
+            background: #fff;
+            border: none;
+            outline: none;
+            border-radius: 40px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+            cursor: pointer;
+            font-size: 16px;
+            color: #000000;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .wrapper button:hover {
+            text-decoration: underline;
+        }
+
+        .otp-container {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .otp-label {
+            font-size: 18px;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .otp-boxes {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .otp-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .otp-separator {
+            font-size: 24px;
+            color: #1E3A8A;
+            align-self: center;
+        }
+
+        .otp-input {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            font-size: 18px;
+            text-align: center;
+            font-weight: 500;
+            color: rgb(0, 0, 0);
+            background: transparent;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .otp-input:focus {
+            border-color: #0145ff;
+            box-shadow: 0 0 5px rgba(1, 69, 255, 0.5);
+        }
+
+        .error {
+            color: #d32f2f;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #ffffff;
+            margin-top: 10px;
+        }
+
+        .register-link {
+            font-size: 14.5px;
+            text-align: center;
+            margin: 20px 0 15px;
+            color: #ffffff;
+        }
+
+        .register-link a {
+            color: rgb(112, 172, 22);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .otp-input {
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
+            }
+            .otp-separator {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <h2>Student Login</h2>
+        <form id="loginForm">
+            <div class="input-box">
+                <input type="tel" id="phone_number" placeholder="Phone Number (e.g., 1234567890)" required>
+                <i class='bx bxs-phone'></i>
+            </div>
+            <button type="submit">Get OTP</button>
+            <div class="loading" id="loading">Loading...</div>
+            <div class="error" id="errorMessage"></div>
+        </form>
+        <div class="otp-container" id="otpContainer">
+            <div class="otp-label">Enter OTP</div>
+            <div class="otp-boxes">
+                <div class="otp-group">
+                    <input type="text" class="otp-input" maxlength="1" data-index="0">
+                    <input type="text" class="otp-input" maxlength="1" data-index="1">
+                    <input type="text" class="otp-input" maxlength="1" data-index="2">
+                </div>
+                <span class="otp-separator">-</span>
+                <div class="otp-group">
+                    <input type="text" class="otp-input" maxlength="1" data-index="3">
+                    <input type="text" class="otp-input" maxlength="1" data-index="4">
+                    <input type="text" class="otp-input" maxlength="1" data-index="5">
+                </div>
+            </div>
+            <button type="button" id="submitOtp">Submit OTP</button>
+            <div class="loading" id="otpLoading">Loading...</div>
+            <div class="error" id="errorMessageOtp"></div>
+        </div>
+        <p class="register-link">Only for students. <a href="/teacher/login">Teacher Login</a> (No OTP required)</p>
+    </div>
+
+    <script>
+        let phone_number = '';
+        const loginForm = document.getElementById('loginForm');
+        const otpContainer = document.getElementById('otpContainer');
+        const loading = document.getElementById('loading');
+        const otpLoading = document.getElementById('otpLoading');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorMessageOtp = document.getElementById('errorMessageOtp');
+        const otpInputs = document.querySelectorAll('.otp-input');
+
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => element.style.display = 'none', 5000); // Auto-hide after 5 seconds
+        }
+
+        function updateOTP() {
+            const otp = Array.from(otpInputs).map(input => input.value.trim() || '0').join('');
+            return otp;
+        }
+
+        function focusNextInput(currentInput) {
+            const index = parseInt(currentInput.dataset.index);
+            if (index < 5) {  // Move to next input, including past the hyphen
+                const nextInput = document.querySelector(`.otp-input[data-index="${index + 1}"]`);
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+        }
+
+        function focusPreviousInput(currentInput) {
+            const index = parseInt(currentInput.dataset.index);
+            if (index > 0) {
+                const previousInput = document.querySelector(`.otp-input[data-index="${index - 1}"]`);
+                if (previousInput) {
+                    previousInput.focus();
+                    previousInput.value = '';  // Clear the previous input for backspace
+                }
+            }
+        }
+
+        // Initialize OTP inputs for continuous typing
+        otpInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value && value.length === 1) {
+                    focusNextInput(e.target);
+                }
+                updateOTP();
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value.length === 0) {
+                    focusPreviousInput(e.target);
+                } else if (e.key === 'ArrowRight' && e.target.value.length === 1) {
+                    focusNextInput(e.target);
+                } else if (e.key === 'ArrowLeft' && e.target.selectionStart === 0) {
+                    focusPreviousInput(e.target);
+                } else if (/^\d$/.test(e.key) && e.target.value.length === 0) {  // Allow only digits
+                    e.target.value = e.key;  // Set the digit immediately
+                    focusNextInput(e.target);
+                    e.preventDefault();  // Prevent default input to avoid double entry
+                }
+            });
+
+            // Allow paste for 6 digits at once
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                const digits = pastedText.replace(/\D/g, '').substring(0, 6);  // Get only digits, max 6
+                if (digits.length === 6) {
+                    otpInputs.forEach((input, i) => {
+                        input.value = digits[i] || '';
+                    });
+                    otpInputs[5].focus();  // Focus on the last input after paste
+                    updateOTP();
+                }
+            });
+
+            // Prevent non-digit input
+            input.addEventListener('keypress', (e) => {
+                if (!/^\d$/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            phone_number = document.getElementById('phone_number').value.trim();
+            if (!/^\d{10}$/.test(phone_number)) {
+                showError(errorMessage, 'Phone number must be exactly 10 digits.');
+                return;
+            }
+
+            loading.style.display = 'block';
+            try {
+                const response = await fetch('/student/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `phone_number=${encodeURIComponent(phone_number)}`
+                });
+                const data = await response.json();
+                loading.style.display = 'none';
+                if (data.message === "OTP generated, enter it below") {
+                    loginForm.style.display = 'none';
+                    otpContainer.style.display = 'flex';
+                    otpInputs[0].focus();
+                } else if (data.error) {
+                    showError(errorMessage, data.error);
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                console.error('Login error:', error);
+                showError(errorMessage, 'An error occurred. Please try again.');
+            }
+        });
+
+        document.getElementById('submitOtp').addEventListener('click', async () => {
+            const otp = updateOTP();
+            if (!/^\d{6}$/.test(otp)) {
+                showError(errorMessageOtp, 'Invalid OTP format. Please enter 6 digits.');
+                return;
+            }
+
+            otpLoading.style.display = 'block';
+            try {
+                const response = await fetch('/student/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `phone_number=${encodeURIComponent(phone_number)}&otp=${encodeURIComponent(otp)}`
+                });
+                const data = await response.json();
+                otpLoading.style.display = 'none';
+                if (data.message === "Login successful") {
+                    if (data.student_id && data.redirect) {
+                        window.location.href = data.redirect; // Redirect to home after login
+                    } else {
+                        showError(errorMessageOtp, 'Redirect URL not provided. Please contact support.');
+                    }
+                } else if (data.error) {
+                    showError(errorMessageOtp, data.error);
+                }
+            } catch (error) {
+                otpLoading.style.display = 'none';
+                console.error('OTP submission error:', error);
+                showError(errorMessageOtp, 'An error occurred. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
